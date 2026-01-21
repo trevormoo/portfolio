@@ -360,16 +360,21 @@
         }
 
         .project-status {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid var(--primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.2rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 600;
             color: var(--primary);
             margin-bottom: 1.5rem;
             position: relative;
             z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
 
         .project-status::before {
@@ -378,14 +383,30 @@
             height: 8px;
             background: var(--primary);
             border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 6px var(--primary), 0 0 12px rgba(0, 255, 136, 0.5);
+            animation: pulse-glow 2s ease-in-out infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .project-status.in-progress {
+            background: rgba(123, 47, 247, 0.1);
+            border-color: rgba(123, 47, 247, 0.3);
+            color: var(--secondary);
+        }
+
+        .project-status.in-progress::before {
+            background: var(--secondary);
+            box-shadow: 0 0 6px var(--secondary), 0 0 12px rgba(123, 47, 247, 0.5);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(0.9);
+            }
         }
 
         .project-title {
@@ -2175,6 +2196,24 @@
             <h2 class="section-title">Featured Projects</h2>
             
             <div class="projects-grid">
+                <!-- Averulo -->
+                <div class="project-card">
+                    <span class="project-status">Live</span>
+                    <h3 class="project-title">Averulo</h3>
+                    <p class="project-desc">Mobile booking platform with React Native app (47 screens), admin dashboard, Node.js backend, Paystack payments, maps integration.</p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">React Native</span>
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Paystack</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://expo.dev/artifacts/eas/jZuLNrkNNHGUZvc55jpY4j.apk" target="_blank" class="project-link">Download APK →</a>
+                        <a href="exp://u.expo.dev/e91af410-469e-4ed4-a169-34a44278e3a3" target="_blank" class="project-link secondary">Expo Go</a>
+                        <a href="https://appetize.io/app/b_b3xg32rwapjt7r3eevz4qszza4" target="_blank" class="project-link secondary">Browser</a>
+                    </div>
+                </div>
+
                 <!-- Ticket Booking -->
                 <div class="project-card">
                     <span class="project-status">Live</span>
@@ -2226,27 +2265,9 @@
                     </div>
                 </div>
 
-                <!-- Averulo -->
-                <div class="project-card">
-                    <span class="project-status">Live</span>
-                    <h3 class="project-title">Averulo</h3>
-                    <p class="project-desc">Mobile booking platform with React Native app (47 screens), admin dashboard, Node.js backend, Paystack payments, maps integration.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">React Native</span>
-                        <span class="tech-tag">Node.js</span>
-                        <span class="tech-tag">PostgreSQL</span>
-                        <span class="tech-tag">Paystack</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://expo.dev/artifacts/eas/jZuLNrkNNHGUZvc55jpY4j.apk" target="_blank" class="project-link">Download APK →</a>
-                        <a href="exp://u.expo.dev/e91af410-469e-4ed4-a169-34a44278e3a3" target="_blank" class="project-link secondary">Expo Go</a>
-                        <a href="https://appetize.io/app/b_b3xg32rwapjt7r3eevz4qszza4" target="_blank" class="project-link secondary">Browser</a>
-                    </div>
-                </div>
-
                 <!-- Esusu Confam -->
                 <div class="project-card">
-                    <span class="project-status" style="background: rgba(123, 47, 247, 0.2); border-color: var(--secondary); color: var(--secondary);">In Progress</span>
+                    <span class="project-status in-progress">In Progress</span>
                     <h3 class="project-title">Esusu Confam</h3>
                     <p class="project-desc">Group savings platform API with contribution tracking, payout scheduling, financial management, JWT authentication.</p>
                     <div class="tech-tags">
@@ -2262,7 +2283,7 @@
 
                 <!-- ShopFlow -->
                 <div class="project-card">
-                    <span class="project-status" style="background: rgba(123, 47, 247, 0.2); border-color: var(--secondary); color: var(--secondary);">In Progress</span>
+                    <span class="project-status in-progress">In Progress</span>
                     <h3 class="project-title">ShopFlow</h3>
                     <p class="project-desc">E-commerce platform with product catalog, shopping cart, Stripe checkout, order management, inventory tracking.</p>
                     <div class="tech-tags">
