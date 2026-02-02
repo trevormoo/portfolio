@@ -3228,36 +3228,41 @@
 
             // Countdown sequence
             const countdownValues = isMobile ? ['2', '1', '🚀'] : ['3', '2', '1', '🚀'];
-            const intervalTime = isMobile ? 600 : 800;
+            const intervalTime = isMobile ? 700 : 900;
             const totalDuration = countdownValues.length * intervalTime;
             let currentIndex = 0;
             let progress = 0;
 
-            // Set initial values
-            countdownEl.textContent = countdownValues[0];
-            if (systemStatus) systemStatus.textContent = systemMessages[0];
-            currentIndex = 1;
+            // Function to update display
+            function updateDisplay(index) {
+                // Pop animation on number change
+                countdownEl.classList.add('pop');
+                setTimeout(() => countdownEl.classList.remove('pop'), 200);
+
+                countdownEl.textContent = countdownValues[index];
+
+                // Update system status and loading text
+                const msgIndex = Math.min(index, systemMessages.length - 1);
+                if (systemStatus) systemStatus.textContent = systemMessages[msgIndex];
+                if (loadingText) loadingText.textContent = loadingTexts[msgIndex];
+            }
+
+            // Set initial values with pop
+            updateDisplay(0);
 
             // Smooth progress bar animation
             const progressInterval = setInterval(() => {
-                progress += 2;
+                progress += 1.5;
                 if (progressBar) progressBar.style.width = Math.min(progress, 100) + '%';
                 if (progress >= 100) clearInterval(progressInterval);
-            }, totalDuration / 50);
+            }, totalDuration / 66);
 
-            // Main countdown
+            // Main countdown - starts after first interval
             const countdownInterval = setInterval(() => {
+                currentIndex++;
+
                 if (currentIndex < countdownValues.length) {
-                    // Pop animation on number change
-                    countdownEl.classList.add('pop');
-                    setTimeout(() => countdownEl.classList.remove('pop'), 150);
-
-                    countdownEl.textContent = countdownValues[currentIndex];
-
-                    // Update system status and loading text
-                    const msgIndex = Math.min(currentIndex, systemMessages.length - 1);
-                    if (systemStatus) systemStatus.textContent = systemMessages[msgIndex];
-                    if (loadingText) loadingText.textContent = loadingTexts[msgIndex];
+                    updateDisplay(currentIndex);
 
                     // Launch sequence when rocket appears
                     if (countdownValues[currentIndex] === '🚀') {
@@ -3271,9 +3276,8 @@
                         setTimeout(() => {
                             loadingScreen.classList.add('hidden');
                             setTimeout(() => loadingScreen.remove(), 1000);
-                        }, 500);
+                        }, 600);
                     }
-                    currentIndex++;
                 }
             }, intervalTime);
         }
