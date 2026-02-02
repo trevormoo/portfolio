@@ -3113,24 +3113,31 @@
         const countdownEl = document.getElementById('countdown');
 
         if (countdownEl && loadingScreen) {
-            // Shorter countdown on mobile for faster load
-            let countdown = isMobile ? 2 : 3;
-            countdownEl.textContent = countdown;
+            // Countdown sequence: 3 -> 2 -> 1 -> 🚀
+            const countdownValues = isMobile ? ['2', '1', '🚀'] : ['3', '2', '1', '🚀'];
+            const intervalTime = isMobile ? 600 : 800;
+            let currentIndex = 0;
+
+            // Set initial value
+            countdownEl.textContent = countdownValues[0];
+            currentIndex = 1;
 
             const countdownInterval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    countdownEl.textContent = countdown;
-                } else {
-                    countdownEl.textContent = '🚀';
-                    setTimeout(() => {
-                        loadingScreen.classList.add('hidden');
-                        // Remove from DOM after transition
-                        setTimeout(() => loadingScreen.remove(), 1000);
-                    }, 300);
-                    clearInterval(countdownInterval);
+                if (currentIndex < countdownValues.length) {
+                    countdownEl.textContent = countdownValues[currentIndex];
+
+                    // If we just displayed the rocket, start hiding
+                    if (countdownValues[currentIndex] === '🚀') {
+                        clearInterval(countdownInterval);
+                        setTimeout(() => {
+                            loadingScreen.classList.add('hidden');
+                            // Remove from DOM after transition
+                            setTimeout(() => loadingScreen.remove(), 1000);
+                        }, 300);
+                    }
+                    currentIndex++;
                 }
-            }, isMobile ? 600 : 800);
+            }, intervalTime);
         }
 
         // ===== WARP SPEED DOUBLE-CLICK EASTER EGG (desktop only) =====
