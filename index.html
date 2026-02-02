@@ -2046,6 +2046,13 @@
             pointer-events: none;
         }
 
+        .loading-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
         .countdown {
             font-size: 8rem;
             font-weight: 700;
@@ -2054,19 +2061,93 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: pulse-countdown 1s ease-in-out infinite;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .countdown.pop {
+            transform: scale(1.3);
+            opacity: 0.8;
         }
 
         @keyframes pulse-countdown {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
         }
 
         .loading-text {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: var(--text-dim);
-            margin-top: 2rem;
             text-transform: uppercase;
-            letter-spacing: 0.5em;
+            letter-spacing: 0.3em;
+            min-height: 1.5em;
+        }
+
+        .system-status {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--primary);
+            opacity: 0.9;
+            min-height: 1.2em;
+            transition: opacity 0.2s ease;
+        }
+
+        .progress-container {
+            width: 280px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .launch-ring {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin-ring 2s linear infinite;
+            opacity: 0.3;
+        }
+
+        .launch-ring:nth-child(2) {
+            width: 240px;
+            height: 240px;
+            border-top-color: var(--secondary);
+            animation-duration: 3s;
+            animation-direction: reverse;
+        }
+
+        @keyframes spin-ring {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-screen.launching .countdown {
+            animation: launch-blast 0.5s ease-out forwards;
+        }
+
+        .loading-screen.launching .launch-ring {
+            animation: ring-expand 0.5s ease-out forwards;
+        }
+
+        @keyframes launch-blast {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(2) translateY(-50px); opacity: 0; }
+        }
+
+        @keyframes ring-expand {
+            to { transform: scale(3); opacity: 0; }
         }
 
         /* Typing Effect */
@@ -2279,8 +2360,16 @@
 <body>
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="countdown" id="countdown">3</div>
-        <div class="loading-text">Initiating Launch Sequence</div>
+        <div class="launch-ring"></div>
+        <div class="launch-ring"></div>
+        <div class="loading-content">
+            <div class="countdown" id="countdown">3</div>
+            <div class="loading-text" id="loadingText">Initiating Launch Sequence</div>
+            <div class="system-status" id="systemStatus">Checking systems...</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Custom Cursor -->
@@ -3108,32 +3197,81 @@
             document.body.appendChild(starFragment);
         }
 
-        // ===== LOADING SCREEN COUNTDOWN (faster on mobile) =====
+        // ===== PROFESSIONAL LOADING SCREEN COUNTDOWN =====
         const loadingScreen = document.getElementById('loadingScreen');
         const countdownEl = document.getElementById('countdown');
+        const loadingText = document.getElementById('loadingText');
+        const systemStatus = document.getElementById('systemStatus');
+        const progressBar = document.getElementById('progressBar');
 
         if (countdownEl && loadingScreen) {
-            // Countdown sequence: 3 -> 2 -> 1 -> 🚀
+            // System messages for professional feel
+            const systemMessages = isMobile ? [
+                'Loading assets...',
+                'Ready for launch!'
+            ] : [
+                'Initializing systems...',
+                'Loading portfolio data...',
+                'Calibrating experience...',
+                'All systems go!'
+            ];
+
+            const loadingTexts = isMobile ? [
+                'Preparing Launch',
+                'Ignition!'
+            ] : [
+                'Initiating Launch Sequence',
+                'Systems Online',
+                'Final Countdown',
+                'Liftoff!'
+            ];
+
+            // Countdown sequence
             const countdownValues = isMobile ? ['2', '1', '🚀'] : ['3', '2', '1', '🚀'];
             const intervalTime = isMobile ? 600 : 800;
+            const totalDuration = countdownValues.length * intervalTime;
             let currentIndex = 0;
+            let progress = 0;
 
-            // Set initial value
+            // Set initial values
             countdownEl.textContent = countdownValues[0];
+            if (systemStatus) systemStatus.textContent = systemMessages[0];
             currentIndex = 1;
 
+            // Smooth progress bar animation
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                if (progressBar) progressBar.style.width = Math.min(progress, 100) + '%';
+                if (progress >= 100) clearInterval(progressInterval);
+            }, totalDuration / 50);
+
+            // Main countdown
             const countdownInterval = setInterval(() => {
                 if (currentIndex < countdownValues.length) {
+                    // Pop animation on number change
+                    countdownEl.classList.add('pop');
+                    setTimeout(() => countdownEl.classList.remove('pop'), 150);
+
                     countdownEl.textContent = countdownValues[currentIndex];
 
-                    // If we just displayed the rocket, start hiding
+                    // Update system status and loading text
+                    const msgIndex = Math.min(currentIndex, systemMessages.length - 1);
+                    if (systemStatus) systemStatus.textContent = systemMessages[msgIndex];
+                    if (loadingText) loadingText.textContent = loadingTexts[msgIndex];
+
+                    // Launch sequence when rocket appears
                     if (countdownValues[currentIndex] === '🚀') {
                         clearInterval(countdownInterval);
+                        clearInterval(progressInterval);
+                        if (progressBar) progressBar.style.width = '100%';
+
+                        // Add launching class for dramatic effect
+                        loadingScreen.classList.add('launching');
+
                         setTimeout(() => {
                             loadingScreen.classList.add('hidden');
-                            // Remove from DOM after transition
                             setTimeout(() => loadingScreen.remove(), 1000);
-                        }, 300);
+                        }, 500);
                     }
                     currentIndex++;
                 }
