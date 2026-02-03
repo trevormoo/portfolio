@@ -3197,90 +3197,46 @@
             document.body.appendChild(starFragment);
         }
 
-        // ===== PROFESSIONAL LOADING SCREEN COUNTDOWN =====
-        const loadingScreen = document.getElementById('loadingScreen');
-        const countdownEl = document.getElementById('countdown');
-        const loadingText = document.getElementById('loadingText');
-        const systemStatus = document.getElementById('systemStatus');
-        const progressBar = document.getElementById('progressBar');
+        // ===== SIMPLE LOADING SCREEN COUNTDOWN =====
+        (function() {
+            var screen = document.getElementById('loadingScreen');
+            var num = document.getElementById('countdown');
+            var status = document.getElementById('systemStatus');
+            var bar = document.getElementById('progressBar');
 
-        if (countdownEl && loadingScreen) {
-            // System messages for professional feel
-            const systemMessages = isMobile ? [
-                'Loading assets...',
-                'Ready for launch!'
-            ] : [
-                'Initializing systems...',
-                'Loading portfolio data...',
-                'Calibrating experience...',
-                'All systems go!'
-            ];
+            if (!screen || !num) return;
 
-            const loadingTexts = isMobile ? [
-                'Preparing Launch',
-                'Ignition!'
-            ] : [
-                'Initiating Launch Sequence',
-                'Systems Online',
-                'Final Countdown',
-                'Liftoff!'
-            ];
+            var steps = ['3', '2', '1', '🚀'];
+            var msgs = ['Initializing...', 'Loading...', 'Ready...', 'Liftoff!'];
+            var i = 0;
+            var progress = 0;
 
-            // Countdown sequence
-            const countdownValues = isMobile ? ['2', '1', '🚀'] : ['3', '2', '1', '🚀'];
-            const intervalTime = isMobile ? 700 : 900;
-            const totalDuration = countdownValues.length * intervalTime;
-            let currentIndex = 0;
-            let progress = 0;
+            // Progress bar
+            var pTimer = setInterval(function() {
+                progress += 4;
+                if (bar) bar.style.width = Math.min(progress, 100) + '%';
+                if (progress >= 100) clearInterval(pTimer);
+            }, 100);
 
-            // Function to update display
-            function updateDisplay(index) {
-                // Pop animation on number change
-                countdownEl.classList.add('pop');
-                setTimeout(() => countdownEl.classList.remove('pop'), 200);
+            // Countdown
+            function tick() {
+                num.textContent = steps[i];
+                if (status) status.textContent = msgs[i];
 
-                countdownEl.textContent = countdownValues[index];
-
-                // Update system status and loading text
-                const msgIndex = Math.min(index, systemMessages.length - 1);
-                if (systemStatus) systemStatus.textContent = systemMessages[msgIndex];
-                if (loadingText) loadingText.textContent = loadingTexts[msgIndex];
+                if (steps[i] === '🚀') {
+                    if (bar) bar.style.width = '100%';
+                    setTimeout(function() {
+                        screen.style.opacity = '0';
+                        setTimeout(function() { screen.remove(); }, 500);
+                    }, 400);
+                } else {
+                    i++;
+                    setTimeout(tick, 800);
+                }
             }
 
-            // Set initial values with pop
-            updateDisplay(0);
-
-            // Smooth progress bar animation
-            const progressInterval = setInterval(() => {
-                progress += 1.5;
-                if (progressBar) progressBar.style.width = Math.min(progress, 100) + '%';
-                if (progress >= 100) clearInterval(progressInterval);
-            }, totalDuration / 66);
-
-            // Main countdown - starts after first interval
-            const countdownInterval = setInterval(() => {
-                currentIndex++;
-
-                if (currentIndex < countdownValues.length) {
-                    updateDisplay(currentIndex);
-
-                    // Launch sequence when rocket appears
-                    if (countdownValues[currentIndex] === '🚀') {
-                        clearInterval(countdownInterval);
-                        clearInterval(progressInterval);
-                        if (progressBar) progressBar.style.width = '100%';
-
-                        // Add launching class for dramatic effect
-                        loadingScreen.classList.add('launching');
-
-                        setTimeout(() => {
-                            loadingScreen.classList.add('hidden');
-                            setTimeout(() => loadingScreen.remove(), 1000);
-                        }, 600);
-                    }
-                }
-            }, intervalTime);
-        }
+            tick();
+        })();
 
         // ===== WARP SPEED DOUBLE-CLICK EASTER EGG (desktop only) =====
         if (!isMobile && !prefersReducedMotion) {
